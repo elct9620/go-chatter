@@ -1,0 +1,47 @@
+/**
+ * Style
+ *
+ * @author Aotoki
+ */
+
+.message {
+  position: relative;
+  z-index: 1;
+}
+
+.message .tooltip-inner {
+  width: auto;
+  max-width: 100%;
+  display: inline-block;
+
+  text-align: left;
+}
+
+.system-message .right .tooltip-arrow {
+  border-right-color: #C0392B;
+}
+
+.system-message .tooltip-inner{
+  background-color: #C0392B;
+}
+
+#message-area {
+  padding-bottom: 92px;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  overflow: scroll;
+}
+
+#message {
+  width: 100%;
+}
+
+#footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
+  padding-top: 2em;
+}

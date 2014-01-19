@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatter</title>
+    <meta charset="utf-8" />
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="css/flat-ui.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <main id="main" class="container">
+    <div class="row">
+      <div id="message-area" class="col-md-12">
+
+      </div>
+    </div>
+
+  </main>
+  <footer id="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <form id="message-form">
+            <fieldset id="input-fieldset" class="row" disabled>
+              <div class="form-group col-md-10">
+                <input type="test" class="form-control" name="message" placeholder="Chat Message ..." id="message">
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Send</button>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script type="javascript/html" id="message-template">
+    <div>
+      <span class="nickname">${nickname}</span>
+      <div class="tooltip right fade in message">
+        <div class="tooltip-arrow"></div>
+        <div class="tooltip-inner">${message}</div>
+      </div>
+    </div>
+  </script>
+  <script src="js/zepto.min.js"></script>
+  <script src="js/websocket.js"></script>
+</body>
+</html>
