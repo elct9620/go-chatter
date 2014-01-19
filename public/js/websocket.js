@@ -33,6 +33,7 @@ var inputFieldset = $("#input-fieldset");
 var messageTemplate = $("#message-template");
 
 function createMessage(nickname, content) {
+  nickname = $("<p>").text(nickname).html();
   content = $("<p>").text(content).html();
   return messageTemplate.tmpl({nickname: nickname, message: content}).appendTo(messageArea);
 }
