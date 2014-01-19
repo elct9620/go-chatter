@@ -1,0 +1,28 @@
+{
+	"ImportPath": "chatter",
+	"GoVersion": "go1.2",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go.net/websocket",
+			"Comment": "null-110",
+			"Rev": "2b669bbfb7baae43e63e0cbe3ebb83c9f9ebb3e5"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Rev": "8b1a9340f98d4526c7d962e71856c2d29670db36"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/martini",
+			"Comment": "v0.1-21-gb836f38",
+			"Rev": "b836f3858ac3e76e09b425f7cc49bf4dcc371686"
+		},
+		{
+			"ImportPath": "menteslibres.net/gosexy/redis",
+			"Rev": "7ee6b8524f24131d56d8c40b4e69cfd3845f8185"
+		},
+		{
+			"ImportPath": "menteslibres.net/gosexy/to",
+			"Rev": "54dec6d00815451f5605ada1c28177398718bde9"
+		}
+	]
+}
