@@ -51,7 +51,7 @@ function appendMessage(rawMessage) {
   body.scrollTop(messageArea.height());
 }
 
-var host window.location.host;
+var host = window.location.host;
 var ws = new WebSocket("ws://" + host + "/chatroom");
 ws.onopen = function(event) {
   inputFieldset.removeAttr("disabled")
