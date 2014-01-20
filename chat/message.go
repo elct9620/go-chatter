@@ -1,4 +1,4 @@
-package chat
+package chatter
 
 type Message struct {
   Name string

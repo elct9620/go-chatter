@@ -4,7 +4,6 @@ import (
   "menteslibres.net/gosexy/redis"
   "code.google.com/p/go.net/websocket"
   "github.com/codegangsta/martini"
-  "container/list"
   "time"
   "fmt"
   "strings"
@@ -13,18 +12,12 @@ import (
 
 var (
   db *redis.Client
-  clients *list.List
-  nickname map[string]string
+  clients map[string]*chatter.Client
 )
 
 func BroadcastMessage(sender *websocket.Conn, message *string) {
-  for item := clients.Front(); item != nil; item = item.Next() {
-    socket, ok := item.Value.(*websocket.Conn)
-    if !ok {
-      panic("it isn't *websocket.Conn")
-    }
-
-    websocket.Message.Send(socket, *message)
+  for _, item := range clients {
+    websocket.Message.Send(item.Socket, *message)
   }
 }
 
@@ -32,7 +25,7 @@ func ResponseMessage(sender *websocket.Conn, message *string) {
   websocket.Message.Send(sender, *message)
 }
 
-func ParseCommand(rawMessage *string, ws *websocket.Conn, uid *string) {
+func ParseCommand(rawMessage *string, client *chatter.Client) {
   if strings.Index(*rawMessage, "/") == 0 {
     commands := strings.SplitN(*rawMessage, " ", 2)
 
@@ -42,20 +35,20 @@ func ParseCommand(rawMessage *string, ws *websocket.Conn, uid *string) {
     default:
       response = "No command found!"
     case "/nickname":
-      broadcast = nickname[*uid] + " change nickname to " + commands[1]
-      nickname[*uid] = commands[1]
+      broadcast = client.Nickname + " change nickname to " + commands[1]
+      client.Nickname = commands[1]
     }
     if len(response) > 0 {
-      ResponseMessage(ws, &response)
+      ResponseMessage(client.Socket, &response)
     }
     if len(broadcast) > 0 {
-      BroadcastMessage(ws, &broadcast)
+      BroadcastMessage(client.Socket, &broadcast)
     }
     return
   }
 
-  message := (&chat.Message{Name: nickname[*uid], Content: *rawMessage}).String()
-  BroadcastMessage(ws, &message)
+  message := chatter.NewMessage(client.Nickname, *rawMessage).String()
+  BroadcastMessage(client.Socket, &message)
 }
 
 func wsHandler(ws *websocket.Conn) {
@@ -64,30 +57,26 @@ func wsHandler(ws *websocket.Conn) {
 
   defer ws.Close()
 
-  uid := fmt.Sprintf("%d-%d", clients.Len(), time.Now().Unix())
-  nickname[uid] = "Guest " + uid
+  uid := fmt.Sprintf("%d-%d", len(clients), time.Now().Unix())
+  client := &chatter.Client{Nickname: "Guest" + uid, Socket: ws}
 
-  item := clients.PushBack(ws)
+  clients[uid] = client
   defer func() {
-    clients.Remove(item)
-    fmt.Printf("Current online clients: %d\n", clients.Len())
-    delete(nickname, uid)
+    delete(clients, uid)
+    fmt.Printf("Current online clients: %d\n", len(clients))
   }()
-
-
 
   for {
     if err = websocket.Message.Receive(ws, &clientMessage); err != nil {
       return
     }
-    ParseCommand(&clientMessage, ws, &uid)
+    ParseCommand(&clientMessage, clients[uid])
   }
 
 }
 
 func main() {
-  clients = list.New()
-  nickname = make(map[string]string)
+  clients = make(map[string]*chatter.Client)
 
   m := martini.Classic()
   m.Use(martini.Static("public"))
