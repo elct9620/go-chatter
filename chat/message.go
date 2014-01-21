@@ -5,7 +5,7 @@ type Message struct {
   Content string
 }
 
-func (m *Message) String() string {
+func (m Message) String() string {
   return m.Name + ":" + m.Content
 }
 

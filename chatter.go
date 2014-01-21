@@ -15,14 +15,14 @@ var (
   clients map[string]*chatter.Client
 )
 
-func BroadcastMessage(sender *websocket.Conn, message *string) {
+func BroadcastMessage(sender *websocket.Conn, packet *chatter.Packet) {
   for _, item := range clients {
-    websocket.Message.Send(item.Socket, *message)
+    websocket.Message.Send(item.Socket, packet.Pack())
   }
 }
 
-func ResponseMessage(sender *websocket.Conn, message *string) {
-  websocket.Message.Send(sender, *message)
+func ResponseMessage(sender *websocket.Conn, packet *chatter.Packet) {
+  websocket.Message.Send(sender, packet.Pack())
 }
 
 func ParseCommand(rawMessage *string, client *chatter.Client) {
@@ -39,16 +39,16 @@ func ParseCommand(rawMessage *string, client *chatter.Client) {
       client.Nickname = commands[1]
     }
     if len(response) > 0 {
-      ResponseMessage(client.Socket, &response)
+      ResponseMessage(client.Socket, &chatter.Packet{Type: "system", Data: response})
     }
     if len(broadcast) > 0 {
-      BroadcastMessage(client.Socket, &broadcast)
+      BroadcastMessage(client.Socket, &chatter.Packet{Type: "system", Data: broadcast})
     }
     return
   }
 
-  message := chatter.NewMessage(client.Nickname, *rawMessage).String()
-  BroadcastMessage(client.Socket, &message)
+  message := chatter.NewMessage(client.Nickname, *rawMessage)
+  BroadcastMessage(client.Socket, &chatter.Packet{Type: "message", Data: message})
 }
 
 func wsHandler(ws *websocket.Conn) {
@@ -63,6 +63,7 @@ func wsHandler(ws *websocket.Conn) {
   clients[uid] = client
   defer func() {
     delete(clients, uid)
+    client = nil
     fmt.Printf("Current online clients: %d\n", len(clients))
   }()
 

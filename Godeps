@@ -17,6 +17,14 @@
 			"Rev": "b836f3858ac3e76e09b425f7cc49bf4dcc371686"
 		},
 		{
+			"ImportPath": "github.com/vmihailenco/bufio",
+			"Rev": "5a6706bb583bf168d886202cb376c877e9c85521"
+		},
+		{
+			"ImportPath": "github.com/vmihailenco/msgpack",
+			"Rev": "2f06bb6e77fac9cfcfbbe18a6d5cfadce816c5ec"
+		},
+		{
 			"ImportPath": "menteslibres.net/gosexy/redis",
 			"Rev": "7ee6b8524f24131d56d8c40b4e69cfd3845f8185"
 		},
