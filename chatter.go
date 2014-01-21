@@ -15,13 +15,13 @@ var (
   clients map[string]*chatter.Client
 )
 
-func BroadcastMessage(sender *websocket.Conn, packet *chatter.Packet) {
+func Broadcast(sender *websocket.Conn, packet *chatter.Packet) {
   for _, item := range clients {
     websocket.Message.Send(item.Socket, packet.Pack())
   }
 }
 
-func ResponseMessage(sender *websocket.Conn, packet *chatter.Packet) {
+func Response(sender *websocket.Conn, packet *chatter.Packet) {
   websocket.Message.Send(sender, packet.Pack())
 }
 
@@ -39,16 +39,15 @@ func ParseCommand(rawMessage *string, client *chatter.Client) {
       client.Nickname = commands[1]
     }
     if len(response) > 0 {
-      ResponseMessage(client.Socket, &chatter.Packet{Type: "system", Data: response})
+      Response(client.Socket, chatter.NewSystemPacket(response))
     }
     if len(broadcast) > 0 {
-      BroadcastMessage(client.Socket, &chatter.Packet{Type: "system", Data: broadcast})
+      Broadcast(client.Socket, chatter.NewSystemPacket(broadcast))
     }
     return
   }
 
-  message := chatter.NewMessage(client.Nickname, *rawMessage)
-  BroadcastMessage(client.Socket, &chatter.Packet{Type: "message", Data: message})
+  Broadcast(client.Socket, chatter.NewMessagePacket(client.Nickname, *rawMessage))
 }
 
 func wsHandler(ws *websocket.Conn) {
@@ -59,12 +58,16 @@ func wsHandler(ws *websocket.Conn) {
 
   uid := fmt.Sprintf("%d-%d", len(clients), time.Now().Unix())
   client := &chatter.Client{Nickname: "Guest" + uid, Socket: ws}
-
   clients[uid] = client
+
+  Broadcast(client.Socket, chatter.NewOnlineCountPacket(len(clients)))
+
   defer func() {
     delete(clients, uid)
+    clientCount := len(clients)
+    Broadcast(client.Socket, chatter.NewOnlineCountPacket(clientCount))
     client = nil
-    fmt.Printf("Current online clients: %d\n", len(clients))
+    fmt.Printf("Current online clients: %d\n", clientCount)
   }()
 
   for {

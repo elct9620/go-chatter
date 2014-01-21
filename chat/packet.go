@@ -16,3 +16,21 @@ func (p Packet) Pack() []byte {
   }
   return packet
 }
+
+/**
+ * Packet Maker
+ */
+
+func NewSystemPacket(message string) *Packet {
+  return &Packet{Type: "system", Data: message}
+}
+
+func NewMessagePacket(nickname string, content string) *Packet {
+  return &Packet{Type: "message", Data: NewMessage(nickname, content)}
+}
+
+func NewOnlineCountPacket(count int) *Packet {
+  return &Packet{Type: "online-count", Data: count}
+}
+
+

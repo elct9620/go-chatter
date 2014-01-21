@@ -26,6 +26,7 @@ messageArea = $("#message-area")
 messageForm = $("#message-form")
 message = $("#message")
 inputFieldset = $("#input-fieldset")
+onlineCount = $("#online-count")
 
 messageTemplate = $("#message-template")
 
@@ -34,11 +35,14 @@ createMessage = (nickname, content) ->
   content = $("<p>").text(content).html()
   return messageTemplate.tmpl({nickname: nickname, message: content}).appendTo(messageArea)
 
-scrollHeight = 0
+updateOnlineCount = (count) ->
+  onlineCount.text(count)
+
 handlePacket = (packet) ->
   switch packet.Type
     when 'message' then createMessage(packet.Data.Name, packet.Data.Content)
     when 'system' then createMessage("System", packet.Data).addClass("system-message")
+    when 'online-count' then updateOnlineCount(packet.Data)
 
   # Auto Scroll
   body.scrollTop(messageArea.height())

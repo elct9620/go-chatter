@@ -22,11 +22,14 @@
         <div class="col-md-12">
           <form id="message-form">
             <fieldset id="input-fieldset" class="row" disabled>
-              <div class="form-group col-md-10">
+              <div class="form-group col-md-9">
                 <input type="test" class="form-control" name="message" placeholder="Chat Message ..." id="message">
               </div>
-              <div class="col-md-2">
+              <div class="col-md-1">
                 <button type="submit" class="btn btn-primary">Send</button>
+              </div>
+              <div class="col-md-2">
+                Online: <span id="online-count" class="btn btn-info">0</span>
               </div>
             </fieldset>
           </form>

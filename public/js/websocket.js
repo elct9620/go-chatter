@@ -14,7 +14,7 @@
 
 
 (function() {
-  var body, createMessage, handlePacket, host, inputFieldset, message, messageArea, messageForm, messageTemplate, scrollHeight, ws;
+  var body, createMessage, handlePacket, host, inputFieldset, message, messageArea, messageForm, messageTemplate, onlineCount, updateOnlineCount, ws;
 
   $.fn.tmpl = function(d) {
     var k, s, v;
@@ -43,6 +43,8 @@
 
   inputFieldset = $("#input-fieldset");
 
+  onlineCount = $("#online-count");
+
   messageTemplate = $("#message-template");
 
   createMessage = function(nickname, content) {
@@ -54,7 +56,9 @@
     }).appendTo(messageArea);
   };
 
-  scrollHeight = 0;
+  updateOnlineCount = function(count) {
+    return onlineCount.text(count);
+  };
 
   handlePacket = function(packet) {
     switch (packet.Type) {
@@ -63,6 +67,9 @@
         break;
       case 'system':
         createMessage("System", packet.Data).addClass("system-message");
+        break;
+      case 'online-count':
+        updateOnlineCount(packet.Data);
     }
     return body.scrollTop(messageArea.height());
   };
