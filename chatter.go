@@ -8,16 +8,27 @@ import (
   "fmt"
   "strings"
   "chatter/chat"
+  "chatter/helper"
 )
 
 var (
   db *redis.Client
   clients map[string]*chatter.Client
+  logSize int64 = 50
 )
 
 func Broadcast(sender *websocket.Conn, packet *chatter.Packet) {
   for _, item := range clients {
     websocket.Message.Send(item.Socket, packet.Pack())
+  }
+  // Store chat log
+  switch packet.Type {
+  case "message", "system":
+    db.RPush("chat:logs", packet)
+    if logLen, _ := db.LLen("chat:logs"); logLen > logSize {
+      log, _ := db.LPop("chat:logs")
+      fmt.Println("Remove log: " + log)
+    }
   }
 }
 
@@ -81,6 +92,9 @@ func wsHandler(ws *websocket.Conn) {
 
 func main() {
   clients = make(map[string]*chatter.Client)
+
+  db = redis.New()
+  db.Connect(helper.GetRedisToGoEnv())
 
   m := martini.Classic()
   m.Use(martini.Static("public"))

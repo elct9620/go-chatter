@@ -2,6 +2,7 @@ package chatter
 
 import (
   "github.com/vmihailenco/msgpack"
+  "fmt"
 )
 
 type Packet struct {
@@ -15,6 +16,14 @@ func (p Packet) Pack() []byte {
     return nil
   }
   return packet
+}
+
+func (p Packet) String() string {
+  switch p.Data.(type) {
+    case string, fmt.Stringer:
+      return fmt.Sprintf("%s::%s", p.Type, p.Data)
+  }
+  return ""
 }
 
 /**
@@ -32,5 +41,3 @@ func NewMessagePacket(nickname string, content string) *Packet {
 func NewOnlineCountPacket(count int) *Packet {
   return &Packet{Type: "online-count", Data: count}
 }
-
-
