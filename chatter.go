@@ -94,7 +94,11 @@ func main() {
   clients = make(map[string]*chatter.Client)
 
   db = redis.New()
-  db.Connect(helper.GetRedisToGoEnv())
+  dbHost, dbPort, dbPassword := helper.GetRedisToGoEnv()
+  db.Connect(dbHost, dbPort)
+  if len(dbPassword) > 0 {
+    db.Auth(dbPassword)
+  }
 
   m := martini.Classic()
   m.Use(martini.Static("public"))
