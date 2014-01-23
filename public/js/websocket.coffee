@@ -53,6 +53,10 @@ ws.binaryType = "arraybuffer"
 ws.onopen = (event)->
   inputFieldset.removeAttr("disabled")
 
+ws.onclose = (event) ->
+  createMessage("System", "You are lost connection, refresh page to reconnect.").addClass("system-message")
+  inputFieldset.attr("disabled", "disabled")
+
 ws.onmessage = (event)->
     packet = msgpack.unpack(new Uint8Array(event.data))
     handlePacket(packet)

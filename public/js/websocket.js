@@ -84,6 +84,11 @@
     return inputFieldset.removeAttr("disabled");
   };
 
+  ws.onclose = function(event) {
+    createMessage("System", "You are lost connection, refresh page to reconnect.").addClass("system-message");
+    return inputFieldset.attr("disabled", "disabled");
+  };
+
   ws.onmessage = function(event) {
     var packet;
     packet = msgpack.unpack(new Uint8Array(event.data));
