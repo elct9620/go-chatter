@@ -3,6 +3,7 @@ package chatter
 import (
   "github.com/vmihailenco/msgpack"
   "fmt"
+  "strings"
 )
 
 type Packet struct {
@@ -40,4 +41,26 @@ func NewMessagePacket(nickname string, content string) *Packet {
 
 func NewOnlineCountPacket(count int) *Packet {
   return &Packet{Type: "online-count", Data: count}
+}
+
+func NewLogsPacket(packets []*Packet) *Packet {
+  return &Packet{Type: "logs", Data: packets}
+}
+
+/**
+ * Upacket
+ */
+
+func StringToPacket(rawData string) *Packet {
+  rawPacket := strings.SplitN(rawData, "::", 2)
+  if len(rawPacket) != 2 {
+    return nil
+  }
+  switch rawPacket[0] { // Check packet type
+    case "system":
+      return &Packet{Type: rawPacket[0], Data: rawPacket[1]}
+    case "message":
+      return &Packet{Type: rawPacket[0], Data: StringToMessage(rawPacket[1])}
+  }
+  return nil
 }

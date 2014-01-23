@@ -38,11 +38,17 @@ createMessage = (nickname, content) ->
 updateOnlineCount = (count) ->
   onlineCount.text(count)
 
+loadLogs = (packets) ->
+  if packets
+    for packet in packets
+      handlePacket(packet)
+
 handlePacket = (packet) ->
   switch packet.Type
     when 'message' then createMessage(packet.Data.Name, packet.Data.Content)
     when 'system' then createMessage("System", packet.Data).addClass("system-message")
     when 'online-count' then updateOnlineCount(packet.Data)
+    when 'logs' then loadLogs(packet.Data)
 
   # Auto Scroll
   body.scrollTop(messageArea.height())

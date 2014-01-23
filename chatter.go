@@ -24,16 +24,30 @@ func Broadcast(sender *websocket.Conn, packet *chatter.Packet) {
   // Store chat log
   switch packet.Type {
   case "message", "system":
-    db.RPush("chat:logs", packet)
-    if logLen, _ := db.LLen("chat:logs"); logLen > logSize {
-      log, _ := db.LPop("chat:logs")
-      fmt.Println("Remove log: " + log)
-    }
+    go SaveLog(packet, time.Now().Unix())
   }
 }
 
 func Response(sender *websocket.Conn, packet *chatter.Packet) {
   websocket.Message.Send(sender, packet.Pack())
+}
+
+func SaveLog(packet *chatter.Packet, timestamp int64) {
+  //TODO: this may have some problem about data write priority
+  db.RPush("chat:logs", packet)
+  if logLen, _ := db.LLen("chat:logs"); logLen > logSize {
+    log, _ := db.LPop("chat:logs")
+    fmt.Println("Remove log: " + log)
+  }
+}
+
+func LoadLogs() []*chatter.Packet {
+  var logPackets []*chatter.Packet
+  logs, _ := db.LRange("chat:logs", 0, -1)
+  for key := range logs {
+    logPackets = append(logPackets, chatter.StringToPacket(logs[key]))
+  }
+  return logPackets
 }
 
 func ParseCommand(rawMessage *string, client *chatter.Client) {
@@ -72,6 +86,7 @@ func wsHandler(ws *websocket.Conn) {
   clients[uid] = client
 
   Broadcast(client.Socket, chatter.NewOnlineCountPacket(len(clients)))
+  Response(client.Socket, chatter.NewLogsPacket(LoadLogs()))
 
   defer func() {
     delete(clients, uid)

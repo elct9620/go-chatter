@@ -14,7 +14,7 @@
 
 
 (function() {
-  var body, createMessage, handlePacket, host, inputFieldset, message, messageArea, messageForm, messageTemplate, onlineCount, updateOnlineCount, ws;
+  var body, createMessage, handlePacket, host, inputFieldset, loadLogs, message, messageArea, messageForm, messageTemplate, onlineCount, updateOnlineCount, ws;
 
   $.fn.tmpl = function(d) {
     var k, s, v;
@@ -60,6 +60,18 @@
     return onlineCount.text(count);
   };
 
+  loadLogs = function(packets) {
+    var packet, _i, _len, _results;
+    if (packets) {
+      _results = [];
+      for (_i = 0, _len = packets.length; _i < _len; _i++) {
+        packet = packets[_i];
+        _results.push(handlePacket(packet));
+      }
+      return _results;
+    }
+  };
+
   handlePacket = function(packet) {
     switch (packet.Type) {
       case 'message':
@@ -70,6 +82,9 @@
         break;
       case 'online-count':
         updateOnlineCount(packet.Data);
+        break;
+      case 'logs':
+        loadLogs(packet.Data);
     }
     return body.scrollTop(messageArea.height());
   };
