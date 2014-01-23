@@ -35,6 +35,7 @@ func Response(sender *websocket.Conn, packet *chatter.Packet) {
 func SaveLog(packet *chatter.Packet, timestamp int64) {
   //TODO: this may have some problem about data write priority
   db.RPush("chat:logs", packet)
+  fmt.Printf("Save log: %s", packet)
   if logLen, _ := db.LLen("chat:logs"); logLen > logSize {
     log, _ := db.LPop("chat:logs")
     fmt.Println("Remove log: " + log)
